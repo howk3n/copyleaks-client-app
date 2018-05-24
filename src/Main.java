@@ -22,7 +22,7 @@ public class Main {
 		LOGIN, SCAN_FILES, PROCESS, RESULT
 	}
 	
-//	Metoda koja vraca novu konekciju na osnovu API url-a i trazenog servisa
+//	Returns a new HttpURLConnection according to the API url and requested service
 	static HttpURLConnection setupJSONConnection(String extension, APIService service) throws MalformedURLException, IOException {
 		String fullUrl = API_URL.concat(extension);
 		HttpURLConnection conn = (HttpURLConnection) ((new URL(fullUrl).openConnection()));
@@ -58,7 +58,7 @@ public class Main {
         return conn;
 	}
 	
-//	Metoda koja vraca AccessToken na osnovu JSON response-a
+//	Returns the AccessToken from the JSON response
 	static String getAccessToken(InputStream in) throws IOException, JSONException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
         JSONObject response = new JSONObject(br.readLine());
@@ -66,7 +66,7 @@ public class Main {
         return accessToken;
 	}
 	
-//	Metoda koja vraca listu ProcessId-eva na osnovu JSON response-a
+//	Returns the list of ProcessId's from the JSON response
 	static ArrayList<String> getProcessIdList(InputStream in) throws IOException, JSONException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
         JSONObject response = new JSONObject(br.readLine());
@@ -81,13 +81,18 @@ public class Main {
         return processId;
 	}
 	
-//	Metoda koja vraca drugi deo URL-a za dat servis na osnovu processId-a
+//	Returns the URL extension for the service based on the processId
 	static String getProcessStatusExtension(String processId) {
 		String extension = "/v1/education/" + processId + "/status";
 		return extension;
 	}
 	
-//	Metoda koja vraca status obrade fajla na osnovu InputStream-a
+	static String getResultExtension(String processId) {
+		String extension = "/v1/education/" + processId + "/result";
+		return extension;
+	}
+	
+//	Returns the file processing status
 	static String getStatus(InputStream in) throws JSONException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
         JSONObject response = new JSONObject(br.readLine());
@@ -97,13 +102,7 @@ public class Main {
         return status;
 	}
 	
-//	Metoda koja vraca drugi deo URL-a za dat servis na osnovu processId-a
-	static String getResultExtension(String processId) {
-		String extension = "/v1/education/" + processId + "/result";
-		return extension;
-	}
-	
-//	Metoda koja vraca rezultate obrade datoteke
+//	Prints the results of the file process
 	static void getResults(InputStream in) throws JSONException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		JSONArray arrayOfResults = new JSONArray(br.readLine());
@@ -161,11 +160,11 @@ public class Main {
 			hasLogin = false;
 			sc = new Scanner(System.in);
 			
-			System.out.println("Dobrodosli na moj projektni zadatak!\n");
+			System.out.println("Welcome to my project assignment!\n");
 			
 			while(goAhead == false) {
-				System.out.println("Da li imate svoj CopyLeaks nalog za autentikaciju?");
-				System.out.println("Ako imate, unesite Y, u suprotnom unesite N");
+				System.out.println("Do you have your own CopyLeaks account?");
+				System.out.println("If you do, type Y, else type N");
 				String answer = sc.nextLine();
 				
 				if(answer.toLowerCase().trim().equals("y")) {
@@ -184,7 +183,7 @@ public class Main {
 				sc = new Scanner(System.in);
 				
 				while(goAhead == false) {
-					System.out.println("Da li zelite da koristite sandbox mode? Y/N");
+					System.out.println("Do you wish to use sandbox mode? Y/N");
 					String answer = sc.nextLine();
 					
 					if(answer.toLowerCase().trim().equals("y")) {
@@ -209,10 +208,10 @@ public class Main {
 			else {
 				sc = new Scanner(System.in);
 					
-				System.out.println("Molim Vas da pazljivo unesete sledece podatke\n");
-				System.out.println("Unesite Vasu email adresu");
+				System.out.println("Please insert the following info carefully!\n");
+				System.out.println("Enter your email address connected to your CopyLeaks account");
 				String email = sc.nextLine().trim();
-				System.out.println("Unesite Vas ApiKey");
+				System.out.println("Enter your API Key");
 				String apiKey = sc.nextLine().trim();
 				System.out.println("");
 				
@@ -237,10 +236,10 @@ public class Main {
 	        	ArrayList<File> files = new ArrayList<File>();
 	        	sc = new Scanner(System.in);
 	        	
-	        	System.out.println("Unesite apsolutne putanje ka .txt ili .html fajlovima. Slusamo Vas dok ne unesete N");
+	        	System.out.println("Enter the absolute path to the .txt or .html files you wish to process. We're listening until you enter N.");
 	        	
 	        	while(goAhead == false) {
-	        		System.out.println("Unesite putanju, ili ako ne zelite vise, unesti slovo N");
+	        		System.out.println("Enter a file path, or if you don't want anymore, enter N.");
 	        		String path;
 	        		path = sc.nextLine().trim();
 	        		
@@ -252,10 +251,10 @@ public class Main {
 	        			sc.close();
 	        		}
 	        		else if(files.isEmpty()){
-	        			System.out.println("Molim Vas bar jedan fajl da unesete");
+	        			System.out.println("Please insert at least one file");
 	        		}
 	        		else {
-	        			System.out.println("Molim Vas da se pobrinete da fajl bude ili .txt ili .html :)");
+	        			System.out.println("Please make sure the file is either .txt or .html");
 	        		}
 	        	}
 	        	
@@ -320,7 +319,7 @@ public class Main {
 		        
 		        in = conn.getInputStream();
 		        processId = getProcessIdList(in);
-		        System.out.println("Uneli ste " + files.size() + " datoteka, a od njih je " + processId.size() + " uspesno uneseno.\n");
+		        System.out.println("You've entered " + files.size() + " files, and " + processId.size() + " of them will be processed successfully.\n");
 	        }
 //	        
 	        
@@ -329,7 +328,7 @@ public class Main {
 	        	String processStatusExtension;
 	        	String status;
 		        long starting;
-	        	System.out.println("Sada pocinjemo sa procesuiranjem fajlova...");
+	        	System.out.println("Processing files...");
 	        	
 	        	for(int i = 0; i < processId.size(); i++) {
 	        		processStatusExtension = getProcessStatusExtension(processId.get(i));
@@ -344,7 +343,7 @@ public class Main {
 	    			        conn.connect();
 	    			        
 	    			        in = conn.getInputStream();
-	    			        System.out.println("Datoteka " + (i+1) + "/" + (processId.size()));
+	    			        System.out.println("File "  + (i + 1) + "/" + (processId.size()));
 	    	        		status = getStatus(in);
 	    	        		
 	    			        starting = System.currentTimeMillis();
@@ -365,7 +364,7 @@ public class Main {
 		        conn = setupJSONConnection(resultExtension, APIService.RESULT);
 				
 				in = conn.getInputStream();
-				System.out.println("Rezultati za datoteku #" + (i+1));
+				System.out.println("Results for file #" + (i + 1));
 				getResults(in);
         	}
 //	        	
